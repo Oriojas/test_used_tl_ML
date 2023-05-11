@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "test-used-tl-ml"
+version = "0.1.0"
+description = ""
+authors = ["oscar50 <oscar@whaleandjaguar.co>"]
+readme = "README.md"
+packages = [{include = "test_used_tl_ml"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
