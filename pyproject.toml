@@ -8,6 +8,7 @@ packages = [{include = "test_used_tl_ml"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pandas = "^2.0.1"
 
 
 [build-system]

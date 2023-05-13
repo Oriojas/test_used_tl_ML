@@ -160,3 +160,4 @@ cython_debug/
 .idea/
 /Usados-202305OR/
 /data/MLA_100k_checked_v3.jsonlines
+*.csv

@@ -1,7 +1,7 @@
 import json
 
 
-class Etl:
+class Ext:
 
     def __init__(self, folder_data: str, n: int):
         self.folder_data = folder_data
