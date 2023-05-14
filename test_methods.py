@@ -15,7 +15,7 @@ def extrac_name(df_n, column, name_column):
 
 
 FOLDER = "data/MLA_100k_checked_v3.jsonlines"
-N = -2
+N = -10000
 
 X_train, y_train, X_test, y_test = Ext(folder_data=FOLDER, n=N).extract()
 
@@ -27,6 +27,8 @@ X_test = extrac_name(df_n=X_test, column="seller_address", name_column="state")
 X_test = extrac_name(df_n=X_test, column="seller_address_state", name_column="name")
 X_test = extrac_name(df_n=X_test, column="seller_address", name_column="city")
 X_test = extrac_name(df_n=X_test, column="seller_address_city", name_column="name")
+X_test = extrac_name(df_n=X_test, column="shipping", name_column="local_pick_up")
+X_test = extrac_name(df_n=X_test, column="shipping", name_column="free_shipping")
 
 X_train = pd.DataFrame(X_train)
 
@@ -36,13 +38,15 @@ X_train = extrac_name(df_n=X_train, column="seller_address", name_column="state"
 X_train = extrac_name(df_n=X_train, column="seller_address_state", name_column="name")
 X_train = extrac_name(df_n=X_train, column="seller_address", name_column="city")
 X_train = extrac_name(df_n=X_train, column="seller_address_city", name_column="name")
+X_train = extrac_name(df_n=X_train, column="shipping", name_column="local_pick_up")
+X_train = extrac_name(df_n=X_train, column="shipping", name_column="free_shipping")
 
-columns = X_train.columns
+# columns = X_train.columns
 
-view_columns = ['seller_address', 'warranty', 'sub_status', 'condition', 'deal_ids',
-                'base_price', 'shipping', 'non_mercado_pago_payment_methods',
-                'seller_id', 'variations', 'site_id', 'listing_type_id', 'price',
-                'attributes', 'buying_mode', 'tags', 'listing_source', 'parent_item_id',
+view_columns = ['seller_address', 'warranty', 'sub_status', 'deal_ids', 'base_price',
+                'shipping', 'non_mercado_pago_payment_methods', 'seller_id',
+                'variations', 'site_id', 'listing_type_id', 'price', 'attributes',
+                'buying_mode', 'tags', 'listing_source', 'parent_item_id',
                 'coverage_areas', 'category_id', 'descriptions', 'last_updated',
                 'international_delivery_mode', 'pictures', 'id', 'official_store_id',
                 'differential_pricing', 'accepts_mercadopago', 'original_price',
@@ -52,7 +56,16 @@ view_columns = ['seller_address', 'warranty', 'sub_status', 'condition', 'deal_i
                 'permalink', 'sold_quantity', 'available_quantity',
                 'seller_address_country', 'seller_address_country_name',
                 'seller_address_state', 'seller_address_state_name',
-                'seller_address_city', 'seller_address_city_name']
+                'seller_address_city', 'seller_address_city_name',
+                'shipping_local_pick_up', 'shipping_free_shipping']
+
+drop_columns = ['seller_address', 'shipping', 'non_mercado_pago_payment_methods', 'secure_thumbnail',
+                'seller_address_country', 'seller_address_state', 'seller_address_city']
+
+X_test["Y"] = list(y_test)
+X_test = X_test.drop(drop_columns, axis=1)
+X_train["Y"] = list(y_train)
+X_train = X_train.drop(drop_columns, axis=1)
 
 X_train.to_csv("data/train.csv")
 X_test.to_csv("data/test.csv")
