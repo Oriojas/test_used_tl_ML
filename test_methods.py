@@ -15,7 +15,7 @@ def extrac_name(df_n, column, name_column):
 
 
 FOLDER = "data/MLA_100k_checked_v3.jsonlines"
-N = -10000
+N = -1
 
 X_train, y_train, X_test, y_test = Ext(folder_data=FOLDER, n=N).extract()
 
