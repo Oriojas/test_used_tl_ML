@@ -18,13 +18,13 @@ FOLDER = "data/"
 
 df_split = pd.read_pickle(FOLDER + "df_text_clean.pkl")
 
-df_split = df_split.sample(100)
+df_split = df_split.sample(1000)
 
-df_train = df_split[0:80]
+df_train = df_split[0:-1]
 df_test = df_split[81:]
 
-df_train[["clean_text", "Y"]].to_csv(FOLDER + "df_text_train.csv", index=False)
-df_test[["clean_text", "Y"]].to_csv(FOLDER + "df_text_test.csv", index=False)
+df_train[["title", "label"]].to_csv(FOLDER + "df_text_train.csv", index=False)
+df_test[["title", "label"]].to_csv(FOLDER + "df_text_test.csv", index=False)
 
 
 
