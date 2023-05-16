@@ -23,8 +23,8 @@ df_split = df_split.sample(1000)
 df_train = df_split[0:-1]
 df_test = df_split[81:]
 
-df_train[["title", "label"]].to_csv(FOLDER + "df_text_train.csv", index=False)
-df_test[["title", "label"]].to_csv(FOLDER + "df_text_test.csv", index=False)
+df_train[["clean_text", "label"]].to_csv(FOLDER + "df_text_train.csv", index=False)
+df_test[["clean_text", "label"]].to_csv(FOLDER + "df_text_test.csv", index=False)
 
 
 
