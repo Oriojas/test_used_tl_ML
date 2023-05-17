@@ -76,10 +76,25 @@ with st.container():
     column_1, column_2 = st.columns([1, 1])
     with column_1:
         st.markdown("#### Resultados variable **title**")
+        st.markdown("Para este caso el mejor desempeño lo tuvo la regresión lógistica con un accuracy de 0.76 y un f1 de 0.75 muestra un desbalance en la clasificación y con precision score se ve este desbalanceo hacia los falsos positivos")
         st.dataframe(df_results_text.style.highlight_max(axis=0))
     with column_2:
         st.markdown("#### Resultados variables **numéricas**")
+        st.markdown("Para este caso el mejor desempeño lo tuvo en KNN con un accuracy de 0.76 y un f1 de 0.75 muestra un desbalance en la clasificación y con precision score se ve este desbalanceo hacia los falsos positivos")
         st.dataframe(df_results_num.style.highlight_max(axis=0))
 
 st.markdown("### Ejemplo de los datos sin normalizar utilizados para el análisis")
 st.dataframe(df_num.head(20))
+
+st.markdown("### Concluciones:")
+st.markdown("""
+* Para mejorar el desempeño se sugiere crear un modelo mixto con texto y numeros, por temas de tiempo no se puedo desarrollar, pero la idea es que el modelo de texto exprese en terminos de probabilidad la clasificación y este sea el valor de entrada a en módelo numerico
+
+* En resumen, en este análisis de datos se realizaron diversas etapas y técnicas para explorar y analizar un conjunto de datos. Se extrajeron los campos relevantes y se llevó a cabo un análisis exploratorio detallado utilizando la biblioteca "ydata_profiling". Se realizó una limpieza de datos y se corrigieron los valores atípicos en la variable "price". Además, se aplicó un análisis de componentes principales (PCA) para comprender la estructura de las variables numéricas y el texto en el campo "title".
+
+* Se intentó construir un clasificador utilizando una LSTM de PyTorch, pero se encontraron problemas de sobreajuste y limitaciones de tiempo y recursos de GPU. Se exploró la posibilidad de hacer un ajuste fino de un modelo preentrenado basado en Roberta de HuggingFace, aunque debido a las limitaciones de memoria de la GPU, este proceso se realizó en la plataforma Google Colab.
+
+* Se entrenaron varios modelos utilizando diferentes algoritmos para las variables de texto y las variables numéricas. Se evaluaron métricas de rendimiento como la precisión (accuracy) y la puntuación F1 (f1_score). Los mejores resultados se obtuvieron con modelos logísticos y SVM con kernel lineal para las variables de texto, mientras que para las variables numéricas, el KNN mostró el mejor rendimiento.
+
+* En general, se ha realizado un análisis exhaustivo utilizando diferentes técnicas y modelos para comprender y predecir los datos. Sin embargo, se recomienda realizar un análisis más detallado y considerar otras técnicas o enfoques para mejorar aún más los resultados obtenidos.
+""")

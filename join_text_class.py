@@ -17,6 +17,7 @@ df_results = pd.DataFrame(columns=["model", "accuracy_score",
                                    "f1_score"])
 
 df = pd.read_pickle("data/df_text_clean.pkl")
+df = df.sample(60000)
 
 corpus = []
 for i in range(len(df)):
