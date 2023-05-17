@@ -8,7 +8,6 @@ from sklearn.metrics import precision_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
 
 SEED = 137
 
@@ -16,19 +15,20 @@ df_results = pd.DataFrame(columns=["model", "accuracy_score",
                                    "precision_score", "recall_score",
                                    "f1_score"])
 
-df = pd.read_pickle("data/df_text_clean.pkl")
+df = pd.read_pickle("data/df_num_norm.pkl")
+# df = df.sample(n=1000)
 
-corpus = []
-for i in range(len(df)):
-    corpus.append(df["clean_text"].iloc[i])
+TargetVariable = 'bin_class'
+Predictors = ['listing_type_id_bronze', 'listing_type_id_free',
+              'listing_type_id_gold', 'listing_type_id_gold_premium',
+              'listing_type_id_gold_pro', 'listing_type_id_gold_special',
+              'listing_type_id_silver', 'available_quantity_False', 'price_norm']
 
-
-cv = CountVectorizer(max_features=1500)
-X = cv.fit_transform(corpus).toarray()
-y = df["label"].values
+X = df[Predictors].values
+y = df[TargetVariable].values
 
 X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                                    test_size=0.20,
+                                                    test_size=0.2,
                                                     random_state=SEED)
 
 # clasificador Gausiano
@@ -43,7 +43,7 @@ df_results.loc[0] = ["GaussianNB",
                      recall_score(y_test, y_pred),
                      f1_score(y_test, y_pred)]
 
-df_results.to_csv("data/results_text_class.csv")
+df_results.to_csv("data/results_num_class.csv")
 print(df_results)
 
 
@@ -59,7 +59,7 @@ df_results.loc[1] = ["LogisticRegression",
                      recall_score(y_test, y_pred),
                      f1_score(y_test, y_pred)]
 
-df_results.to_csv("data/results_text_class.csv")
+df_results.to_csv("data/results_num_class.csv")
 print(df_results)
 
 
@@ -77,7 +77,7 @@ df_results.loc[2] = ["KNeighborsClassifier",
                      recall_score(y_test, y_pred),
                      f1_score(y_test, y_pred)]
 
-df_results.to_csv("data/results_text_class.csv")
+df_results.to_csv("data/results_num_class.csv")
 print(df_results)
 
 
@@ -95,7 +95,7 @@ df_results.loc[3] = ["SVM_k_lineal",
                      recall_score(y_test, y_pred),
                      f1_score(y_test, y_pred)]
 
-df_results.to_csv("data/results_text_class.csv")
+df_results.to_csv("data/results_num_class.csv")
 print(df_results)
 
 # SVM k_sigmoid
@@ -111,5 +111,6 @@ df_results.loc[4] = ["SVM_sigmoid",
                      precision_score(y_test, y_pred),
                      recall_score(y_test, y_pred),
                      f1_score(y_test, y_pred)]
-df_results.to_csv("data/results_text_class.csv")
+
+df_results.to_csv("data/results_num_class.csv")
 print(df_results)
