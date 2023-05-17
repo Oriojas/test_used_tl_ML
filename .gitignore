@@ -164,3 +164,4 @@ cython_debug/
 *.pkl
 /mygraph1.png
 /mygraph.png
+poetry.lock

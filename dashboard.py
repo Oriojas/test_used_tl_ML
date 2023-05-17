@@ -1,10 +1,7 @@
-import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 import streamlit.components.v1 as components
-
-HTML1 = os.environ["HTML1"]
 
 st.set_page_config(page_title="Dashboard",
                    page_icon="🛒",
