@@ -1,25 +1,17 @@
 import torch
-import spacy
-import torchtext
-import numpy as np
-import pandas as pd
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-from torchdata.datapipes.iter import IterableWrapper, FileOpener
-import torch
-import torch.nn.functional as F
-import torchtext
 import time
 import random
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
+from spacy.lang.es import Spanish
+from spacy.tokenizer import Tokenizer
+from torchtext.data.utils import get_tokenizer
+from torchtext.vocab import build_vocab_from_iterator
+from torchdata.datapipes.iter import IterableWrapper, FileOpener
 
 torch.backends.cudnn.deterministic = True
 
-from spacy.tokenizer import Tokenizer
-from spacy.lang.es import Spanish
 nlp = Spanish()
-# Create a blank Tokenizer with just the English vocab
 sp_tokenizer = Tokenizer(nlp.vocab)
 
 RANDOM_SEED = 137
@@ -36,22 +28,12 @@ NUM_CLASSES = 2
 
 print(f"GPU available: {torch.cuda.is_available()}")
 
-
-
-
-# def tokenize(text_c):
-#     return [tok.text for tok in spacy_es.tokenizer(text_c)]
-
-
-# df = pd.read_csv("data/df_text_train.csv")
-
 datapipe = IterableWrapper(["data/df_text_train.csv"])
 datapipe = FileOpener(datapipe, mode='b')
 datapipe = datapipe.parse_csv(skip_lines=1)
 
 N_ROWS = len(list(datapipe))  # 50000
 
-# Split into training and val datapipes early on. Will build vocabulary from training datapipe only.
 train_dp, valid_dp, test_dp = datapipe.random_split(total_length=N_ROWS,
                                                     weights={"train": 0.8, "valid": 0.1, "test": 0.1},
                                                     seed=RANDOM_SEED)
@@ -62,9 +44,11 @@ train_dp, valid_dp, test_dp = datapipe.random_split(total_length=N_ROWS,
 
 tokenizer = get_tokenizer("basic_english")
 
+
 def yield_tokens(data_iter):
     for text, _ in data_iter:
         yield tokenizer(text)
+
 
 def get_vocab(train_datapipe):
     vocab = build_vocab_from_iterator(yield_tokens(train_datapipe),
@@ -79,8 +63,7 @@ print("Vocabulary size: ", len(vocab))
 
 print(vocab.get_itos()[:10])
 
-
-PADDING_VALUE=vocab['<PAD>']
+PADDING_VALUE = vocab['<PAD>']
 
 text_transform = lambda x: [vocab[token] for token in tokenizer(x)]
 label_transform = lambda x: 1 if x == '1' else 0
@@ -97,20 +80,19 @@ from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 import torch
 
+
 def collate_batch(batch):
-   text_list, label_list = [], []
-   for (_text, _label) in batch:
+    text_list, label_list = [], []
+    for (_text, _label) in batch:
         processed_text = torch.tensor(text_transform(_text))
         text_list.append(processed_text)
         label_list.append(label_transform(_label))
-   return pad_sequence(text_list, padding_value=PADDING_VALUE).to(DEVICE), torch.tensor(label_list).to(DEVICE)
+    return pad_sequence(text_list, padding_value=PADDING_VALUE).to(DEVICE), torch.tensor(label_list).to(DEVICE)
 
 
 from torch.utils.data import Sampler, Dataset
 
 
-# Create our own sampler, to ensure we function with multiple worker threads
-# See https://discuss.pytorch.org/t/using-distributedsampler-in-combination-with-batch-sampler-to-make-sure-batches-have-sentences-of-similar-length/119824/3
 class BatchSamplerSimilarLength(Sampler):
     def __init__(self, dataset, batch_size, indices=None, shuffle=True):
         self.batch_size = batch_size
@@ -148,24 +130,25 @@ class BatchSamplerSimilarLength(Sampler):
     def __len__(self):
         return len(self.pooled_indices) // self.batch_size
 
+
 train_dp_list = list(train_dp)
 valid_dp_list = list(valid_dp)
 test_dp_list = list(test_dp)
 
 train_loader = DataLoader(train_dp_list,
-                          batch_sampler=BatchSamplerSimilarLength(dataset = train_dp_list,
+                          batch_sampler=BatchSamplerSimilarLength(dataset=train_dp_list,
                                                                   batch_size=BATCH_SIZE),
                           collate_fn=collate_batch)
 valid_loader = DataLoader(train_dp_list,
-                          batch_sampler=BatchSamplerSimilarLength(dataset = valid_dp_list,
+                          batch_sampler=BatchSamplerSimilarLength(dataset=valid_dp_list,
                                                                   batch_size=BATCH_SIZE,
                                                                   shuffle=False),
                           collate_fn=collate_batch)
 test_loader = DataLoader(train_dp_list,
-                          batch_sampler=BatchSamplerSimilarLength(dataset = test_dp_list,
-                                                                  batch_size=BATCH_SIZE,
-                                                                  shuffle=False),
-                          collate_fn=collate_batch)
+                         batch_sampler=BatchSamplerSimilarLength(dataset=test_dp_list,
+                                                                 batch_size=BATCH_SIZE,
+                                                                 shuffle=False),
+                         collate_fn=collate_batch)
 
 text_batch, label_batch = next(iter(train_loader))
 print(text_batch.size())
@@ -201,14 +184,12 @@ text_batch, label_batch = next(iter(train_loader))
 print(f'Text matrix size: {text_batch.size()}')
 print(f'Target vector size: {label_batch.size()}')
 
+
 def compute_accuracy(model, data_loader, device):
-
     with torch.no_grad():
-
         correct_pred, num_examples = 0, 0
 
         for i, (features, targets) in enumerate(data_loader):
-
             features = features.to(device)
             targets = targets.float().to(device)
 
@@ -218,7 +199,7 @@ def compute_accuracy(model, data_loader, device):
             num_examples += targets.size(0)
             correct_pred += (predicted_labels == targets).sum().to("cpu")
 
-    return float(correct_pred)/num_examples * 100
+    return float(correct_pred) / num_examples * 100
 
 
 def train_model(model, num_epochs, train_loader,
@@ -284,11 +265,9 @@ def train_model(model, num_epochs, train_loader,
 
     return minibatch_loss_list, train_acc_list, valid_acc_list
 
-import matplotlib.pyplot as plt
 
 def plot_training_loss(minibatch_loss_list, num_epochs, iter_per_epoch,
                        results_dir=None, averaging_iterations=100):
-
     plt.figure()
     ax1 = plt.subplot(1, 1, 1)
     ax1.plot(range(len(minibatch_loss_list)),
@@ -296,13 +275,13 @@ def plot_training_loss(minibatch_loss_list, num_epochs, iter_per_epoch,
 
     if len(minibatch_loss_list) > 1000:
         ax1.set_ylim([
-            0, np.max(minibatch_loss_list[1000:])*1.5
-            ])
+            0, np.max(minibatch_loss_list[1000:]) * 1.5
+        ])
     ax1.set_xlabel('Iterations')
     ax1.set_ylabel('Loss')
 
     ax1.plot(np.convolve(minibatch_loss_list,
-                         np.ones(averaging_iterations,)/averaging_iterations,
+                         np.ones(averaging_iterations, ) / averaging_iterations,
                          mode='valid'),
              label='Running Average')
     ax1.legend()
@@ -310,9 +289,9 @@ def plot_training_loss(minibatch_loss_list, num_epochs, iter_per_epoch,
     ###################
     # Set scond x-axis
     ax2 = ax1.twiny()
-    newlabel = list(range(num_epochs+1))
+    newlabel = list(range(num_epochs + 1))
 
-    newpos = [e*iter_per_epoch for e in newlabel]
+    newpos = [e * iter_per_epoch for e in newlabel]
 
     ax2.set_xticks(newpos[::10])
     ax2.set_xticklabels(newlabel[::10])
@@ -332,12 +311,11 @@ def plot_training_loss(minibatch_loss_list, num_epochs, iter_per_epoch,
 
 
 def plot_accuracy(train_acc_list, valid_acc_list, results_dir):
-
     num_epochs = len(train_acc_list)
 
-    plt.plot(np.arange(1, num_epochs+1),
+    plt.plot(np.arange(1, num_epochs + 1),
              train_acc_list, label='Training')
-    plt.plot(np.arange(1, num_epochs+1),
+    plt.plot(np.arange(1, num_epochs + 1),
              valid_acc_list, label='Validation')
 
     plt.xlabel('Epoch')
@@ -379,11 +357,12 @@ class LSTM(torch.nn.Module):
         output = self.fc(hidden)
         return output
 
+
 model = LSTM(input_dim=len(vocab),
              embedding_dim=EMBEDDING_DIM,
              hidden_dim=HIDDEN_DIM,
-             output_dim=NUM_CLASSES # could use 1 for binary classification
-)
+             output_dim=NUM_CLASSES  # could use 1 for binary classification
+             )
 
 model = model.to(DEVICE)
 
