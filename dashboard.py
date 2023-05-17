@@ -11,7 +11,7 @@ st.title("Resultados análisis")
 st.markdown("""En este dashboard se condensan los resultados de los análisis relizados, las concluciones se encuentran 
                 al final de este tablero, para cualquier duda consultar [oscarriojas@gmail.com](oscarriojas@gmail.com),
                 el código se encuentra en el siguiente repositorio: 
-                [repo prueba]("https://github.com/Oriojas/test_used_tl_ML.git")
+                https://github.com/Oriojas/test_used_tl_ML.git
             """)
 
 df_num = pd.read_pickle("data/df_all.pkl")
